@@ -8,6 +8,10 @@
         >
       </div>
       <p v-if="isLoading">Loading</p>
+      <p v-else-if="!isLoading && error">{{ error }}</p>
+      <p v-else-if="!isLoading && (reults || results.length === 0)">
+        No results found. Add survey first
+      </p>
       <ul v-else>
         <survey-result
           v-for="result in results"
@@ -31,12 +35,14 @@ export default {
     return {
       results: [],
       isLoading: false,
+      error: null,
     };
   },
 
   methods: {
     loadExperiences() {
       this.isLoading = true;
+      this.error = null;
       fetch(
         'https://vue-http-demo-4901b-default-rtdb.asia-southeast1.firebasedatabase.app/surveys.json'
         // method: 'GET', this is the default so no need to set this
@@ -60,6 +66,11 @@ export default {
             });
           }
           this.results = results;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.isLoading = false;
+          this.error = 'Failed to fetch data';
         });
     },
   },
